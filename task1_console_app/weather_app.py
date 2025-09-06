@@ -242,12 +242,27 @@ def main():
     """
     Main function to run the weather app
     """
-    # You need to get your API key from https://openweathermap.org/api
-    api_key = input("Enter your OpenWeatherMap API key: ").strip()
+    # Try to load API key from config file first
+    api_key = None
+    try:
+        import sys
+        import os
+        # Add parent directory to path to access config.py
+        parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        sys.path.append(parent_dir)
+        from config import OPENWEATHER_API_KEY
+        api_key = OPENWEATHER_API_KEY
+        print("✅ API key loaded from config file")
+    except ImportError:
+        print("⚠️  Config file not found, please enter API key manually")
     
-    if not api_key:
-        print("❌ API key is required. Please get one from https://openweathermap.org/api")
-        return
+    # If no API key from config, ask user
+    if not api_key or api_key == "":
+        api_key = input("Enter your OpenWeatherMap API key: ").strip()
+        
+        if not api_key:
+            print("❌ API key is required. Please get one from https://openweathermap.org/api")
+            return
     
     app = WeatherApp(api_key)
     app.run_console_app()
