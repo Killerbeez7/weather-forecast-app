@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Weather History - Task 5{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="bi bi-clock-history"></i> Weather History
+        </h1>
+        <p class="text-muted">View recent weather data, API requests, and statistics</p>
+    </div>
+</div>
+
+<!-- Recent Weather Data -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-thermometer"></i> Recent Weather Data
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if recent_weather %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>City</th>
+                                    <th>Temperature</th>
+                                    <th>Condition</th>
+                                    <th>Humidity</th>
+                                    <th>Pressure</th>
+                                    <th>Wind Speed</th>
+                                    <th>Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for weather in recent_weather %}
+                                <tr>
+                                    <td>
+                                        <i class="bi bi-geo-alt"></i> {{ weather.city.name }}
+                                        <br><small class="text-muted">{{ weather.city.country }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold">{{ weather.temperature }}°C</span>
+                                        <br><small class="text-muted">Feels like {{ weather.feels_like }}°C</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ weather.weather_main }}</span>
+                                        <br><small class="text-muted">{{ weather.weather_description }}</small>
+                                    </td>
+                                    <td>{{ weather.humidity }}%</td>
+                                    <td>{{ weather.pressure }} hPa</td>
+                                    <td>{{ weather.wind_speed }} m/s</td>
+                                    <td>
+                                        <small>{{ weather.timestamp|date:"M d, Y H:i" }}</small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-cloud-slash display-4 text-muted"></i>
+                        <p class="text-muted mt-2">No weather data available yet</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent API Requests -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-activity"></i> Recent API Requests
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if recent_requests %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>City</th>
+                                    <th>Status</th>
+                                    <th>Response Time</th>
+                                    <th>Error Message</th>
+                                    <th>Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for request in recent_requests %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ request.get_request_type_display }}</span>
+                                    </td>
+                                    <td>
+                                        {% if request.city_name %}
+                                            <i class="bi bi-geo-alt"></i> {{ request.city_name }}
+                                        {% else %}
+                                            <span class="text-muted">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if request.success %}
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle"></i> Success
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-danger">
+                                                <i class="bi bi-x-circle"></i> Failed
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if request.response_time %}
+                                            {{ request.response_time|floatformat:3 }}s
+                                        {% else %}
+                                            <span class="text-muted">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if request.error_message %}
+                                            <small class="text-danger">{{ request.error_message|truncatechars:50 }}</small>
+                                        {% else %}
+                                            <span class="text-muted">None</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small>{{ request.timestamp|date:"M d, Y H:i" }}</small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-activity display-4 text-muted"></i>
+                        <p class="text-muted mt-2">No API requests logged yet</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Statistics -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-graph-up"></i> Recent Weather Statistics
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if recent_statistics %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Coldest City</th>
+                                    <th>Coldest Temperature</th>
+                                    <th>Average Temperature</th>
+                                    <th>Total Cities</th>
+                                    <th>Calculated At</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in recent_statistics %}
+                                <tr>
+                                    <td>
+                                        <i class="bi bi-snow"></i> {{ stat.coldest_city }}
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold text-primary">{{ stat.coldest_temperature }}°C</span>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold text-info">{{ stat.average_temperature|floatformat:1 }}°C</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ stat.total_cities }} cities</span>
+                                    </td>
+                                    <td>
+                                        <small>{{ stat.calculation_timestamp|date:"M d, Y H:i" }}</small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-graph-up display-4 text-muted"></i>
+                        <p class="text-muted mt-2">No statistics calculated yet</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
